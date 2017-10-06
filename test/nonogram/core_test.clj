@@ -56,5 +56,18 @@
                                   :columns [[1] [1] [2 1] [1] [1] [2 1] [1] [1]]})))
     (is (= (art->nonogram [[1 1] [1 1]]) {:rows [[2] [2]] :columns [[2] [2]]}))))
 
-;;TODO "Draws given nonogram map with rows and columns into a table where the first column has the
-;;            nonogram counts for each row and the first rows has the nonogram counts for each column.
+(deftest nonogram-column->string-test
+  (testing "Prints a single nonogram column in a string format, if it has multiple values, those should be separated with a line break"
+    (is (= (nonogram-column->string [2]) "2"))
+    (is (= (nonogram-column->string [2 3]) "2\n3"))))
+
+(deftest nonogram-row->string-test
+  (testing "Prints a single nonogram row in a string format, if it has multiple values, those should be flattened and followed by a line break"
+    (is (= (nonogram-row->string [2]) "2\n"))
+    (is (= (nonogram-row->string [2 3]) "23\n"))))
+
+(deftest draw-nonogram-test
+  (testing "Draws given nonogram map with rows and columns into a table where the first column has the
+            nonogram counts for each row and the first rows has the nonogram counts for each column."
+    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 22\n2\n2\n"))
+    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 22\n2\n23\n2\n"))))

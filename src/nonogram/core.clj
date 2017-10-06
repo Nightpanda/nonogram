@@ -17,10 +17,16 @@
   {:rows (graphic-arrays->nonogram-format art)
    :columns (graphic-arrays->nonogram-format (art->graphic-columns art))})
 
-;;WIP
+(defn nonogram-column->string [column]
+  (clojure.string/join "\n" column))
+
+(defn nonogram-row->string [row]
+  (str (clojure.string/join (flatten row)) "\n"))
+
 (defn draw-nonogram [nonogram]
-  (clojure.string/join (flatten (:columns nonogram)))
-  (map #(str % "n")  (flatten (:rows nonogram))))
+  (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))
+                                        "\n"
+                                        (map #(nonogram-row->string %) (:rows nonogram))))))
 
 (defn -main
   [& args]
@@ -30,4 +36,5 @@
              [0 1 0 0 0 0 1 0]
              [0 0 1 1 1 1 0 0]]]
     (println (map #(clojure.string/join %) art))
-    (println (art->nonogram art))))
+    (println (art->nonogram art))
+    (println (draw-nonogram (art->nonogram art)))))
