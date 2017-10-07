@@ -59,7 +59,7 @@
 (deftest nonogram-column->string-test
   (testing "Prints a single nonogram column in a string format, if it has multiple values, those should be separated with a line break"
     (is (= (nonogram-column->string '(2)) "2"))
-    (is (= (nonogram-column->string '(2 3)) "2\n3"))))
+    (is (= (nonogram-column->string '(2 3)) "23"))))
 
 (deftest nonogram-row->string-test
   (testing "Prints a single nonogram row in a string format, if it has multiple values, those should be flattened and followed by a line break"
@@ -77,10 +77,20 @@
     a map with keyword column0 containing the first part, a map with keyword column1 the next
     and so on."
     (is (= (nonogram-columns->printtable [[2]]) [{:column0 "2"}]))
-    (is (= (nonogram-columns->printtable [[2 3] [4]]) [{:column0 "2\n3"} {:column1 "4"}]))))
+    (is (= (nonogram-columns->printtable [[2 3] [4]]) [{:column0 "23"} {:column1 "4"}]))))
+
+(deftest join-printtable-rows-and-columns-test
+  (testing "Takes printtable formatted rows and column and joins them into a single array so all
+they keys are used as headers."
+    (is (= (join-printtable-rows-and-columns [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}]) [{:column0 "23"} {:column1 "4"} {:row "23"} {:row "4"}]))))
+
+(deftest form-printtable-headers-test
+  (testing "Takes printtable formatted rows and columns and detemines the needed headers from them."
+    (is (= (form-printtable-headers [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}])
+           [:row :column0 :column1]))))
 
 (deftest draw-nonogram-test
   (testing "Draws given nonogram map with rows and columns into a table where the first column has the
             nonogram counts for each row and the first rows has the nonogram counts for each column."
-    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 22\n22"))
-    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 22\n2\n232"))))
+    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 2222"))
+    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 222232"))))

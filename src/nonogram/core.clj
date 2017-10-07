@@ -1,4 +1,5 @@
 (ns nonogram.core
+  (:require [clojure.pprint :refer [print-table]])
   (:gen-class))
 
 (defn graphic-array->nonogram-format
@@ -18,7 +19,7 @@
    :columns (graphic-arrays->nonogram-format (art->graphic-columns art))})
 
 (defn nonogram-column->string [column]
-  (clojure.string/join "\n" column))
+  (clojure.string/join column))
 
 (defn nonogram-row->string [row]
   (str (clojure.string/join (flatten row))))
@@ -30,11 +31,16 @@
   (let [column-names (for [column-number (range 0 (count columns))] (str "column" column-number))
         column-keywords (map #(keyword %) column-names)
         column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))]
-    (for [index (range 0 (count column-keywords))] {(nth column-keywords index) (nth column-values index)})))
+    (into [] (for [index (range 0 (count column-keywords))] {(nth column-keywords index) (nth column-values index)}))))
+
+(defn join-printtable-rows-and-columns [rows columns]
+  (concat columns rows))
+
+(defn form-printtable-headers [print-rows print-columns]
+  (concat (keys (first print-rows)) (keys (reduce merge print-columns))))
 
 (defn draw-nonogram [nonogram]
   (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))
-                                        "\n"
                                         (map #(nonogram-row->string %) (:rows nonogram))))))
 
 (defn -main
@@ -43,7 +49,12 @@
              [0 0 1 0 0 1 0 0]
              [1 0 0 0 0 0 0 1]
              [0 1 0 0 0 0 1 0]
-             [0 0 1 1 1 1 0 0]]]
-    (println (map #(clojure.string/join %) art))
-    (println (art->nonogram art))
-    (println (draw-nonogram (art->nonogram art)))))
+             [0 0 1 1 1 1 0 0]]
+        nonogram (art->nonogram art)
+        print-columns (nonogram-columns->printtable (:columns nonogram))
+        print-rows (nonogram-rows->printtable (:rows nonogram))
+        headers (form-printtable-headers print-rows print-columns)
+        print-data (join-printtable-rows-and-columns print-rows print-columns)]
+    ;(println (map #(clojure.string/join %) art))
+                                        ;(println (art->nonogram art))
+    (print-table headers print-data)))
