@@ -21,7 +21,16 @@
   (clojure.string/join "\n" column))
 
 (defn nonogram-row->string [row]
-  (str (clojure.string/join (flatten row)) "\n"))
+  (str (clojure.string/join (flatten row))))
+
+(defn nonogram-rows->printtable [rows]
+  (into [] (for [row (map #(flatten %) rows)] {:row (clojure.string/join row)})))
+
+(defn nonogram-columns->printtable [columns]
+  (let [column-names (for [column-number (range 0 (count columns))] (str "column" column-number))
+        column-keywords (map #(keyword %) column-names)
+        column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))]
+    (for [index (range 0 (count column-keywords))] {(nth column-keywords index) (nth column-values index)})))
 
 (defn draw-nonogram [nonogram]
   (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))

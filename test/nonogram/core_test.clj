@@ -58,16 +58,29 @@
 
 (deftest nonogram-column->string-test
   (testing "Prints a single nonogram column in a string format, if it has multiple values, those should be separated with a line break"
-    (is (= (nonogram-column->string [2]) "2"))
-    (is (= (nonogram-column->string [2 3]) "2\n3"))))
+    (is (= (nonogram-column->string '(2)) "2"))
+    (is (= (nonogram-column->string '(2 3)) "2\n3"))))
 
 (deftest nonogram-row->string-test
   (testing "Prints a single nonogram row in a string format, if it has multiple values, those should be flattened and followed by a line break"
-    (is (= (nonogram-row->string [2]) "2\n"))
-    (is (= (nonogram-row->string [2 3]) "23\n"))))
+    (is (= (nonogram-row->string '(2)) "2"))
+    (is (= (nonogram-row->string '(2 3)) "23"))))
+
+(deftest nonogram-rows->printtable-test
+  (testing "Takes nonogram rows from a nonogram map and returns a vector of maps with
+    the keyword row containing the nonogram values of each row"
+    (is (= (nonogram-rows->printtable [[2]]) [{:row "2"}]))
+    (is (= (nonogram-rows->printtable [[2 3] [4]]) [{:row "23"} {:row "4"}]))))
+
+(deftest nonogram-columns->printtable-test
+  (testing "Takes nonogram columns from a nonogram map and returns a vector of maps with
+    a map with keyword column0 containing the first part, a map with keyword column1 the next
+    and so on."
+    (is (= (nonogram-columns->printtable [[2]]) [{:column0 "2"}]))
+    (is (= (nonogram-columns->printtable [[2 3] [4]]) [{:column0 "2\n3"} {:column1 "4"}]))))
 
 (deftest draw-nonogram-test
   (testing "Draws given nonogram map with rows and columns into a table where the first column has the
             nonogram counts for each row and the first rows has the nonogram counts for each column."
-    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 22\n2\n2\n"))
-    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 22\n2\n23\n2\n"))))
+    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 22\n22"))
+    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 22\n2\n232"))))
