@@ -34,7 +34,8 @@
     (into [] (for [index (range 0 (count column-keywords))] {(nth column-keywords index) (nth column-values index)}))))
 
 (defn join-printtable-rows-and-columns [rows columns]
-  (concat columns rows))
+  (concat (map #(merge % (nth columns (.indexOf rows %))) rows) (subvec columns (count rows))))
+
 
 (defn form-printtable-headers [print-rows print-columns]
   (concat (keys (first print-rows)) (keys (reduce merge print-columns))))

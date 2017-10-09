@@ -82,7 +82,10 @@
 (deftest join-printtable-rows-and-columns-test
   (testing "Takes printtable formatted rows and column and joins them into a single array so all
 they keys are used as headers."
-    (is (= (join-printtable-rows-and-columns [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}]) [{:column0 "23"} {:column1 "4"} {:row "23"} {:row "4"}]))))
+    (is (= (join-printtable-rows-and-columns [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}]) 
+      [{:column0 "23" :row "23" } {:column1 "4" :row "4"}]))
+    (is (= (join-printtable-rows-and-columns [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"} {:column2 "6"}]) 
+      [{:column0 "23" :row "23" } {:column1 "4" :row "4"} {:column2 "6"}]))))
 
 (deftest form-printtable-headers-test
   (testing "Takes printtable formatted rows and columns and detemines the needed headers from them."
