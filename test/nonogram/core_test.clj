@@ -76,17 +76,20 @@
   (testing "Takes nonogram columns from a nonogram map and returns a vector of maps with
     a map with keyword column0 containing the first part, a map with keyword column1 the next
     and so on."
-    (is (= (nonogram-columns->printtable [[2]]) [{:column0 "2"}]))
-    (is (= (nonogram-columns->printtable [[2 3] [4]]) [{:column0 "23"} {:column1 "4"}]))))
+    (is (= (nonogram-columns->printtable [[2]]) {:column0 "2"}))
+    (is (= (nonogram-columns->printtable [[2 3] [4]]) {:column0 "23" :column1 "4"}))))
 
 (deftest join-printtable-rows-and-columns-test
   (testing "Takes printtable formatted rows and column and joins them into a single array so all
 they keys are used as headers."
-    (is (= (join-printtable-rows-and-columns [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}]) [{:column0 "23"} {:column1 "4"} {:row "23"} {:row "4"}]))))
+    (is (= (join-printtable-rows-and-columns 
+      (nonogram-rows->printtable [[2]])
+      (nonogram-columns->printtable [[2]]))
+      [{:column0 "2"} {:row "2"}]))))
 
 (deftest form-printtable-headers-test
   (testing "Takes printtable formatted rows and columns and detemines the needed headers from them."
-    (is (= (form-printtable-headers [{:row "23"} {:row "4"}] [{:column0 "23"} {:column1 "4"}])
+    (is (= (form-printtable-headers [{:row "23"} {:row "4"}] {:column0 "23" :column1 "4"})
            [:row :column0 :column1]))))
 
 (deftest draw-nonogram-test
