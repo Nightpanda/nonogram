@@ -1,5 +1,7 @@
 (ns nonogram.core
-  (:require [clojure.pprint :refer [print-table]])
+  (:require [clojure.pprint :refer [print-table]]
+            [clojure.java.io :refer [resource]])
+  (:use mikera.image.core)
   (:gen-class))
 
 (defn graphic-array->nonogram-format
@@ -9,7 +11,11 @@
   (map #(count %) (filter #(some #{1} %) (partition-by #(= % 0) pixel-data))))
 
 (defn graphic-arrays->nonogram-format [graphics]
-  (filter not-empty (map #(graphic-array->nonogram-format %) graphics)))
+    (filter not-empty
+       (map (fn [graphic]
+              (if (every? #(= 0 %) graphic)
+                [0]
+                (graphic-array->nonogram-format graphic))) graphics)))
 
 (defn art->graphic-columns [art]
   (apply mapv vector art))
@@ -45,13 +51,38 @@
   (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))
                                         (map #(nonogram-row->string %) (:rows nonogram))))))
 
+(defn random-image [square-size]
+  (let [image (new-image square-size square-size)
+        pixels (get-pixels image)]
+        (dotimes [i (* square-size square-size)]
+          (aset pixels i (rand-int 2)))
+          (set-pixels image pixels)
+          image))
+
+(defn -main2 []
+                                        ;(map #(print %) (slurp "./face.png"))
+                                        ;  (let [pixels ((load-image-resource "./face.png"))])
+  (let [;image (-> "./cat2.ICO " resource load-image)
+        image (random-image 16)
+        pixels (get-pixels image)
+        ]
+          (let [rows (partition 16 pixels)
+          art (map (fn [row] (map #(if (= % 0) 0 1) row)) rows)]
+          (println (map #(println %) art)))
+
+        
+    )
+
+)
+
 (defn -main
   [& args]
-  (let [art [[0 0 1 0 0 1 0 0]
-             [0 0 1 0 0 1 0 0]
-             [1 0 0 0 0 0 0 1]
-             [0 1 0 0 0 0 1 0]
-             [0 0 1 1 1 1 0 0]]
+  (let [square-size 4
+        image (random-image square-size);(-> "./cat2.png" resource load-image)
+        pixels (get-pixels image)
+        rows (partition square-size pixels)
+        art (vec (map (fn [row] (vec (map #(if (= % 0) 0 1) row))) rows))
+;        art (partition 64 (vec pixels))
         nonogram (art->nonogram art)
         print-columns (nonogram-columns->printtable (:columns nonogram))
         print-rows (nonogram-rows->printtable (:rows nonogram))
@@ -60,7 +91,9 @@
     ;(println (map #(clojure.string/join %) art))
                                         ;(println (art->nonogram art))
       ;                   (println headers)
-                          (println print-columns)
-                          (println print-rows)       
-                          (println print-data)
+;                          (println print-columns)
+;                          (println print-rows)
+;                          (println print-data)
+                                        ;    (print-table headers print-data)
+    (println (map #(println %) art))
     (print-table headers print-data)))

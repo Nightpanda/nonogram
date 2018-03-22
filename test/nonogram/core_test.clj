@@ -19,7 +19,7 @@
     (is (= (graphic-arrays->nonogram-format [[1]]) [[1]]))
     (is (= (graphic-arrays->nonogram-format [[1 1]]) [[2]]))
     (is (= (graphic-arrays->nonogram-format [[1 1] [1]]) [[2] [1]]))
-    (is (= (graphic-arrays->nonogram-format [[1 1] [] [1 1 1]]) [[2] [3]]))))
+    (is (= (graphic-arrays->nonogram-format [[1 1] [] [1 1 1]]) [[2] [0] [3]]))))
 
 (deftest art->graphics-columns-test
   (testing "An art image consisting of pixel data in 1s and 0s should result in that data
@@ -54,7 +54,8 @@
                [0 0 1 1 1 1 0 0]]]
       (is (= (art->nonogram art) {:rows [[1 1] [1 1] [1 1] [1 1] [4]]
                                   :columns [[1] [1] [2 1] [1] [1] [2 1] [1] [1]]})))
-    (is (= (art->nonogram [[1 1] [1 1]]) {:rows [[2] [2]] :columns [[2] [2]]}))))
+    (is (= (art->nonogram [[1 1] [1 1]]) {:rows [[2] [2]] :columns [[2] [2]]}))
+    (is (= (art->nonogram [[1 0] [1 0]]) {:rows [[1] [1]] :columns [[2] [0]]}))))
 
 (deftest nonogram-column->string-test
   (testing "Prints a single nonogram column in a string format, if it has multiple values, those should be separated with a line break"
