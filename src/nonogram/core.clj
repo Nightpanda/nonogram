@@ -1,6 +1,6 @@
 (ns nonogram.core
   (:require [clojure.pprint :refer [print-table]]
-            [clojure.java.io :refer [resource]])
+            [clojure.java.io :refer [resource as-file]])
   (:use mikera.image.core)
   (:gen-class))
 
@@ -34,7 +34,7 @@
   (for [row (map #(flatten %) rows)] {:row (clojure.string/join row)}))
 
 (defn nonogram-columns->printtable [columns]
-  (let [column-names (for [column-number (range 0 (count columns))] (str "column" column-number))
+  (let [column-names (for [column-number (range 0 (count columns))] (str "" column-number))
         column-keywords (map #(keyword %) column-names)
         column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))
         columns-printable (for [index (range 0 (count column-keywords))]
@@ -59,41 +59,44 @@
           (set-pixels image pixels)
           image))
 
-(defn -main2 []
-                                        ;(map #(print %) (slurp "./face.png"))
-                                        ;  (let [pixels ((load-image-resource "./face.png"))])
-  (let [;image (-> "./cat2.ICO " resource load-image)
-        image (random-image 16)
-        pixels (get-pixels image)
-        ]
-          (let [rows (partition 16 pixels)
-          art (map (fn [row] (map #(if (= % 0) 0 1) row)) rows)]
-          (println (map #(println %) art)))
+(defn print-art [art]
+  (println (map #(println %) art)))
 
-        
-    )
+(defn find-image [path]
+  ;;TODO add error checking for file not found
+  (let [image (-> path resource load-image)]
+    image))
 
-)
-
-(defn -main
-  [& args]
-  (let [square-size 4
-        image (random-image square-size);(-> "./cat2.png" resource load-image)
+(defn image->art [image]
+  (let [square-size (width image)
         pixels (get-pixels image)
         rows (partition square-size pixels)
-        art (vec (map (fn [row] (vec (map #(if (= % 0) 0 1) row))) rows))
-;        art (partition 64 (vec pixels))
-        nonogram (art->nonogram art)
-        print-columns (nonogram-columns->printtable (:columns nonogram))
+        art (vec (map (fn [row] (vec (map #(if (= % 0) 0 1) row))) rows))]
+        art))
+
+(defn print-nonogram [nonogram]
+  (let [print-columns (nonogram-columns->printtable (:columns nonogram))
         print-rows (nonogram-rows->printtable (:rows nonogram))
         headers (form-printtable-headers print-rows print-columns)
         print-data (join-printtable-rows-and-columns print-rows print-columns)]
-    ;(println (map #(clojure.string/join %) art))
-                                        ;(println (art->nonogram art))
-      ;                   (println headers)
-;                          (println print-columns)
-;                          (println print-rows)
-;                          (println print-data)
-                                        ;    (print-table headers print-data)
-    (println (map #(println %) art))
     (print-table headers print-data)))
+
+(defn random-nonogram [size]
+  (->> (random-image size)
+    (image->art)
+    (art->nonogram)
+    (print-nonogram)))
+
+(defn image-file->nonogram [image]
+  (->> (image->art image)
+       (art->nonogram)))
+
+(defn image-nonogram [path]
+  (->> (find-image path)
+       (image-file->nonogram)
+       (print-nonogram)))
+
+(defn -main [& args]
+  (image-nonogram (first args)))
+
+
