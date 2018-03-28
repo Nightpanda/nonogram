@@ -34,7 +34,7 @@
   (for [row (map #(flatten %) rows)] {:row (clojure.string/join row)}))
 
 (defn nonogram-columns->printtable [columns]
-  (let [column-names (for [column-number (range 0 (count columns))] (str "" column-number))
+  (let [column-names (for [column-number (range 0 (count columns))] (str column-number))
         column-keywords (map #(keyword %) column-names)
         column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))
         columns-printable (for [index (range 0 (count column-keywords))]
@@ -45,7 +45,9 @@
   (conj rows columns))
 
 (defn form-printtable-headers [print-rows print-columns]
-  (concat (keys (first print-rows)) (map #(key %) print-columns)))
+  (let [rows (keys (first print-rows))
+        cols (sort-by (fn [col] (read-string (name (key col)))) print-columns)]
+  (concat rows (keys cols))))
 
 (defn draw-nonogram [nonogram]
   (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))

@@ -77,8 +77,11 @@
   (testing "Takes nonogram columns from a nonogram map and returns a vector of maps with
     a map with keyword column0 containing the first part, a map with keyword column1 the next
     and so on."
-    (is (= (nonogram-columns->printtable [[2]]) {:column0 "2"}))
-    (is (= (nonogram-columns->printtable [[2 3] [4]]) {:column0 "23" :column1 "4"}))))
+    (is (= (nonogram-columns->printtable [[2]]) {:0 "2"}))
+    (is (= (nonogram-columns->printtable [[2 3] [4]]) {:0 "23" :1 "4"}))
+    (is (= (nonogram-columns->printtable 
+      [[1 1 3] [2 1] [1 1 1 1 1] [1 2 1] [1 1 1] [2 2] [1 1] [3 3] [4 1 2]])
+      {:0 "113" :1 "21" :2 "11111" :3 "121" :4 "111" :5 "22" :6 "11" :7 "33"  :8 "412"}))))
 
 (deftest join-printtable-rows-and-columns-test
   (testing "Takes printtable formatted rows and column and joins them into a single array so all
@@ -86,12 +89,24 @@ they keys are used as headers."
     (is (= (join-printtable-rows-and-columns 
       (nonogram-rows->printtable [[2]])
       (nonogram-columns->printtable [[2]]))
-      [{:column0 "2"} {:row "2"}]))))
+      [{:0 "2"} {:row "2"}]))
+    (is (= (join-printtable-rows-and-columns 
+      [{:row 1} {:row 3} {:row 1} {:row 11}]
+      {:0 2, :1 11, :2 2, :3 1})
+      [{:row 1} {:row 3} {:row 1} {:row 11} {:0 2, :1 11, :2 2, :3 1}]))))
 
 (deftest form-printtable-headers-test
   (testing "Takes printtable formatted rows and columns and detemines the needed headers from them."
-    (is (= (form-printtable-headers [{:row "23"} {:row "4"}] {:column0 "23" :column1 "4"})
-           [:row :column0 :column1]))))
+    (is (= (form-printtable-headers [{:row "23"} {:row "4"}] {:0 "23" :1 "4"})
+           [:row :0 :1]))
+    (is (= (form-printtable-headers 
+      [{:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "4"}]
+       {:0 "23" :1 "4" :2 "23" :3 "4" :4 "23" :5 "4" :6 "23" :7 "4" :8 "4"})
+        [:row :0 :1 :2 :3 :4 :5 :6 :7 :8]))
+    (is (= (form-printtable-headers 
+      [{:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "4"} {:row "4"} {:row "4"}]
+       {:0 "23" :1 "4" :2 "23" :3 "4" :4 "23" :5 "4" :6 "23" :7 "4" :8 "4" :9 "4" :10 "4"})
+        [:row :0 :1 :2 :3 :4 :5 :6 :7 :8 :9 :10]))))
 
 (deftest draw-nonogram-test
   (testing "Draws given nonogram map with rows and columns into a table where the first column has the
