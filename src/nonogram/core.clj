@@ -37,16 +37,22 @@
   (let [column-names (for [column-number (range 0 (count columns))] (str column-number))
         column-keywords (map #(keyword %) column-names)
         column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))
-        columns-printable (for [index (range 0 (count column-keywords))]
-                  {(nth column-keywords index) (nth column-values index)})]
-        (into {} columns-printable)))
+        columns-printable (map #(into {} %) (for [index (range 0 (apply max (map count columns)))] (map-indexed (fn [idx col-values] (if (< index (count col-values)) {(keyword (str idx)) (str (nth (reverse col-values) index))})) columns)))
+        ;filtered (into {} (filter (comp some? val) columns-printable))
+        ;columns-printable (for [index (range 0 (count column-keywords))] (map #((nth column-keywords index) (nth % index)) columns))
+;        columns-printable (for [index (range 0 (count column-keywords))] (flatten (map (fn [col-values] {(nth column-keywords index) (nth col-values index)}) (nth columns index))))
+        ]
+    columns-printable
+ ;   (flatten columns-printable)
+;    (for [index (range 0 (count column-keywords))] (map #({(nth index column-keywords) (nth index %)}) columns))
+    ))
 
 (defn join-printtable-rows-and-columns [rows columns]
-  (conj rows columns))
+  (concat rows columns))
 
 (defn form-printtable-headers [print-rows print-columns]
   (let [rows (keys (first print-rows))
-        cols (sort-by (fn [col] (read-string (name (key col)))) print-columns)]
+        cols (sort-by (fn [col] (read-string (name (key col)))) (first print-columns))]
   (concat rows (keys cols))))
 
 (defn draw-nonogram [nonogram]
@@ -100,5 +106,3 @@
 
 (defn -main [& args]
   (image-nonogram (first args)))
-
-
