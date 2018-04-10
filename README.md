@@ -5,11 +5,13 @@ Creates nonogram number coloring puzzles from images or at random.
 ## Usage
 
 $ lein run first-argument second-argument
-first-argument: path to the image-file
-second-argument: max-width for the image, gets resized if larger than this
+
+* first-argument: path to the image-file
+* second-argument: max-width for the image, gets resized if larger than this
 
 ## Examples
 Also useful with $lein repl
+
 Then you can use the methods directly, like (random-nonogram size) where size
 is the integer number for the size of the random image to be created and turned 
 into a nonogram.
