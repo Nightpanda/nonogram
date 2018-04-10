@@ -66,19 +66,19 @@
           image))
 
 (defn print-art [art]
-  (println (map #(println %) art)))
+  (println (map #(println %) art))
+  art)
 
 (defn find-image [path]
   ;;TODO add error checking for file not found
   (let [image (-> path resource load-image)]
-    image
-    ))
+    image))
 
 (defn image->art [image]
   (let [square-size (width image)
         pixels (get-pixels image)
         rows (partition square-size pixels)
-        art (vec (map (fn [row] (vec (map #(if (= % 0) 0 1) row))) rows))]
+        art (vec (map (fn [row] (vec (map #(if (or (= % 0) (= % -1)) 0 1) row))) rows))]
         art))
 
 (defn print-nonogram [nonogram]
@@ -116,4 +116,4 @@
        (print-nonogram)))
 
 (defn -main [& args]
-  (image-nonogram (first args)))
+  (image-nonogram-max-size (first args) (read-string (last args))))
