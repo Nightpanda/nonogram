@@ -1,32 +1,36 @@
 # nonogram
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+Creates nonogram number coloring puzzles from images or at random.
 
 ## Usage
 
-FIXME: explanation
-
-    $ java -jar nonogram-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
+$ lein run first-argument second-argument
+first-argument: path to the image-file
+second-argument: max-width for the image, gets resized if larger than this
 
 ## Examples
+Also useful with $lein repl
+Then you can use the methods directly, like (random-nonogram size) where size
+is the integer number for the size of the random image to be created and turned 
+into a nonogram.
 
-...
+You can also create nonogram from huge images with (image-nonogram path), but be 
+warned, it takes a while and the end result is really confusing to view from a terminal.
+
+You can also view the art once you have created it with (print-art)
+
+For larger nonograms, you can't see the end result clearly so I suggest throwing
+the result to a file and then viewing it in an editor that has better viewing 
+capabilities.
+
+$ lein run ./image-path 64 > resulting-nonogram.txt 
 
 ### Bugs
 
-...
+No clean exception handling for file not found and such.
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+### TODO
+Add better command-line usage for the non repl users
 
 ## License
 
