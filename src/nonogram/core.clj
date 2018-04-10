@@ -71,7 +71,8 @@
 (defn find-image [path]
   ;;TODO add error checking for file not found
   (let [image (-> path resource load-image)]
-    image))
+    image
+    ))
 
 (defn image->art [image]
   (let [square-size (width image)
@@ -89,13 +90,25 @@
 
 (defn random-nonogram [size]
   (->> (random-image size)
-    (image->art)
-    (art->nonogram)
-    (print-nonogram)))
+       (image->art)
+       (art->nonogram)
+       (print-nonogram)))
+
+(defn image-file->max-size-nonogram [max-width image]
+  (let [re-sized-image (if (> (width image) max-width)
+                         (resize image max-width)
+                         image)]
+    (->> (image->art re-sized-image)
+         (art->nonogram))))
 
 (defn image-file->nonogram [image]
-  (->> (image->art image)
-       (art->nonogram)))
+    (->> (image->art image)
+         (art->nonogram)))
+
+(defn image-nonogram-max-size [path max-size]
+  (->> (find-image path)
+       (image-file->max-size-nonogram max-size)
+       (print-nonogram)))
 
 (defn image-nonogram [path]
   (->> (find-image path)
