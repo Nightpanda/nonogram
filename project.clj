@@ -7,4 +7,8 @@
 		 [net.mikera/imagez "0.12.0"]]
   :main ^:skip-aot nonogram.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}
+             :dev
+             {:plugins
+              [[lein-kibit "0.1.6"]
+               [venantius/yagni "0.1.4"]]}})

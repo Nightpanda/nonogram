@@ -62,11 +62,6 @@
     (is (= (nonogram-column->string '(2)) "2"))
     (is (= (nonogram-column->string '(2 3)) "23"))))
 
-(deftest nonogram-row->string-test
-  (testing "Prints a single nonogram row in a string format, if it has multiple values, those should be flattened and followed by a line break"
-    (is (= (nonogram-row->string '(2)) "2"))
-    (is (= (nonogram-row->string '(2 3)) "23"))))
-
 (deftest nonogram-rows->printtable-test
   (testing "Takes nonogram rows from a nonogram map and returns a vector of maps with
     the keyword row containing the nonogram values of each row"
@@ -108,9 +103,3 @@ they keys are used as headers."
             [{:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "23"} {:row "4"} {:row "4"} {:row "4"} {:row "4"}]
             [{:0 "2" :1 "4" :2 "2" :3 "4" :4 "2" :5 "4" :6 "2" :7 "4" :8 "4" :9 "1" :10 "6"} {:3 "2" :2 "4" :4 "5" :6 "4"}])
            [:row :0 :1 :2 :3 :4 :5 :6 :7 :8 :9 :10]))))
-
-(deftest draw-nonogram-test
-  (testing "Draws given nonogram map with rows and columns into a table where the first column has the
-            nonogram counts for each row and the first rows has the nonogram counts for each column."
-    (is (= (draw-nonogram {:rows [[2] [2]] :columns [[2] [2]]}) " 2222"))
-    (is (= (draw-nonogram {:rows [[2 3] [2]] :columns [[2] [2 2]]}) " 222232"))))

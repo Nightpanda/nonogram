@@ -27,9 +27,6 @@
 (defn nonogram-column->string [column]
   (clojure.string/join column))
 
-(defn nonogram-row->string [row]
-  (str (clojure.string/join (flatten row))))
-
 (defn nonogram-rows->printtable [rows]
   (for [row (map #(flatten %) rows)] {:row (clojure.string/join row)}))
 
@@ -37,11 +34,11 @@
   (let [column-names (for [column-number (range 0 (count columns))] (str column-number))
         column-keywords (map #(keyword %) column-names)
         column-values (for [column (map #(flatten %) columns)] (nonogram-column->string column))
-        columns-printable (map #(into {} %) 
-          (for [index (range 0 (apply max (map count columns)))] 
-            (map-indexed 
-              (fn [idx col-values] 
-                (if (< index (count col-values)) 
+        columns-printable (map #(into {} %)
+          (for [index (range 0 (apply max (map count columns)))]
+            (map-indexed
+              (fn [idx col-values]
+                (if (< index (count col-values))
                   {(keyword (str idx)) (str (nth (reverse col-values) index))})) columns)))]
     columns-printable))
 
@@ -53,10 +50,6 @@
         cols (sort-by (fn [col] (read-string (name (key col)))) (first print-columns))]
   (concat rows (keys cols))))
 
-(defn draw-nonogram [nonogram]
-  (str " " (clojure.string/join (concat (map #(nonogram-column->string %) (:columns nonogram))
-                                        (map #(nonogram-row->string %) (:rows nonogram))))))
-
 (defn random-image [square-size]
   (let [image (new-image square-size square-size)
         pixels (get-pixels image)]
@@ -66,12 +59,20 @@
           image))
 
 (defn print-art [art]
-  (println (map #(println %) art))
-  art)
+  (let [squashed-art (clojure.string/join "\n" (map #(clojure.string/join "" %) art))]
+    (println squashed-art)))
+
+(defn print-ascii-art [art ascii-mappings]
+"Uses ascii-mappings to draw greyscaled art filling grey with they value of key :1 and the white with the value of key :0. For example {:1 'X' :0 '0'}"
+  (let [squashed-art (clojure.string/join "\n" (map #(clojure.string/join "" %) art))
+        replaced-1 (clojure.string/replace #"1" (str (:1 ascii-mappings)) squashed-art)
+        manipulated-art (-> (clojure.string/replace  squashed-art #"1" (str (:1 ascii-mappings)))
+                             (clojure.string/replace #"0" (str (:0 ascii-mappings))))]
+    (println manipulated-art)))
 
 (defn find-image [path]
-  ;;TODO add error checking for file not found
-  (let [image (-> path resource load-image)]
+(let [image (try (-> path resource load-image)
+		 (catch IllegalArgumentException e (str "No file found with exception: " (.getMessage e))))]
     image))
 
 (defn image->art [image]
@@ -94,6 +95,26 @@
        (art->nonogram)
        (print-nonogram)))
 
+(defn draw-random-nonogram [size]
+  (->> (random-image size)
+       (image->art)
+       (print-art)))
+
+(defn draw-random-nonogram-ascii [size ascii-mappings]
+  (-> (random-image size)
+       (image->art)
+       (print-ascii-art ascii-mappings)))
+
+(defn draw-nonogram-ascii [image size ascii-mappings]
+  (-> image
+       (image->art)
+       (print-ascii-art ascii-mappings)))
+
+(defn draw-nonogram [image size]
+  (-> image
+      (image->art)
+      (print-art)))
+
 (defn image-file->max-size-nonogram [max-width image]
   (let [re-sized-image (if (> (width image) max-width)
                          (resize image max-width)
@@ -101,19 +122,27 @@
     (->> (image->art re-sized-image)
          (art->nonogram))))
 
-(defn image-file->nonogram [image]
-    (->> (image->art image)
-         (art->nonogram)))
-
 (defn image-nonogram-max-size [path max-size]
   (->> (find-image path)
        (image-file->max-size-nonogram max-size)
        (print-nonogram)))
 
-(defn image-nonogram [path]
-  (->> (find-image path)
-       (image-file->nonogram)
-       (print-nonogram)))
-
 (defn -main [& args]
-  (image-nonogram-max-size (first args) (read-string (last args))))
+  (let [first-arg (first args)
+        second-arg (second args)
+        third-arg (if (> (count args) 2)
+                    (read-string (nth args 2)))
+        size (read-string (last args))]
+	(if (not (= (type size) java.lang.Long))
+	  (throw (AssertionError. "Last argument must be a convertible to java.lang.Long with (read-string) for the size of nonogram")))
+    (if (= first-arg "random")
+      (if (= second-arg "draw")
+        (if (and (some? (:0 third-arg)) (some? (:1 third-arg)))
+          (draw-random-nonogram-ascii size third-arg)
+          (draw-random-nonogram size))
+        (random-nonogram size))
+      (if (= second-arg "draw")
+        (if (and (some? (:0 third-arg)) (some? (:1 third-arg)))
+          (draw-nonogram-ascii (find-image first-arg) size third-arg)
+          (draw-nonogram (find-image first-arg) size))
+        (image-nonogram-max-size first-arg size)))))

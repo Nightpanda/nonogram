@@ -6,10 +6,23 @@ Example of a nonogram created.
 
 ## Usage
 
-$ lein run first-argument second-argument
+```bash
+lein run first-argument second-argument third-argument last-argument
+```
 
-* first-argument: path to the image-file
-* second-argument: max-width for the image, gets resized if larger than this
+* first-argument: path to the image-file (lein run root folder is ./src) or random
+* second-argument: string "draw" if you want to draw the ascii art of the nonogram
+* third-argument: map for the ascii art with keys :0 and :1. :1 value is used for the grey colored parts and :0 is used for the white coloder parts {:0 "O" :1 :"X"}. Used in a "draw" run.
+* last-argument: max-width for the image, gets resized if larger than this, always required
+
+```bash
+lein run "face.png" 16
+lein run "face.png" "draw" 16 
+lein run "face.png" "{:0 Z :1 @}" 16 
+lein run "random" 16
+lein run "random" "draw" 16
+lein run "random" "draw" "{:0 Z :1 @}" 16
+```
 
 ## Examples
 Also useful with $lein repl
@@ -30,11 +43,11 @@ capabilities.
 $ lein run ./image-path 64 > resulting-nonogram.txt 
 
 ### Bugs
-
-No clean exception handling for file not found and such.
+Odd inputs can result in odd exceptions.
 
 ### TODO
-Add better command-line usage for the non repl users
+* Optimize running times
+* Refactor main function
 
 ## License
 
