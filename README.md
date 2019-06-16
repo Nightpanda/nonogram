@@ -42,12 +42,27 @@ capabilities.
 
 $ lein run ./image-path 64 > resulting-nonogram.txt 
 
+## AWS
+Uses serverless to deploy, currently serverless is assumed to be installed globally with npm install -g or similar. Also aws-cli is needed.
+
+You need a file ~/.aws/credentials with the profile [nonogram-dev].
+
+Invoking a function with --log shows the resulting nonogram.
+
+```bash
+serverless deploy
+serverless invoke --function random-nonogram --aws-profile nonogram-dev --log
+```
+
 ### Bugs
 Odd inputs can result in odd exceptions.
 
 ### TODO
 * Optimize running times
 * Refactor main function
+* Add serverless as lein npm dependency
+* Extend AWS functionality to include the full range of the command line nonogram
+* Lambda should return the nonogram, not just print it in logs
 
 ## License
 

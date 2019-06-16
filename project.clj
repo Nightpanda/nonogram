@@ -4,7 +4,9 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-		 [net.mikera/imagez "0.12.0"]]
+		 [net.mikera/imagez "0.12.0"]
+		 [com.amazonaws/aws-lambda-java-core "1.2.0"]
+		 [com.amazonaws/aws-lambda-java-events "2.2.5"]]
   :main ^:skip-aot nonogram.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
